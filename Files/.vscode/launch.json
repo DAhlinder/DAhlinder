@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell: Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}"
+        },
+        {
+            "name": "PowerShell: Launch Files with Default Params",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}",
+            "args": ["-Source 'c:\\temp' -Destination 'c:\\temp\\to' -FromDate '2020-04-20 16:30' -Debug"]
+        },
+        {
+            "name": "PowerShell: Launch Files VSProject Params",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${file}",
+            "args": ["-Source 'C:\\VSProject\\RixStat' -Destination 'c:\\temp\\to' -Debug"]
+        }
+        //-FromDate
+    ]
+}

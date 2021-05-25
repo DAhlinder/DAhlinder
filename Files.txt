@@ -1,0 +1,84 @@
+# $path = 'c:\temp'
+# $exclude = 'bin','C:\temp\bin'
+# Get-ChildItem -Path $path -Exclude $exclude -Recurse
+
+
+
+# Get-ChildItem $path |
+#       Where-Object{$_.Creationtime -gt (Get-Date).addMinutes(-15) -AND $_.Length -gt 0Kb} |
+#       Format-Table -Auto |
+#       Out-String |
+#       Out-file "$path\maybe.txt"
+
+
+#       $file_list = Get-ChildItem  $path | Where-Object {([datetime]::now.Date -eq $_.lastwritetime.Date)};
+Clear-Host
+$from = 'c:\temp'
+$to = 'c:\temp\to'
+
+$exclude = @("exclude.txt")
+$excludeMatch = @("bin", "to")
+
+$minDate = (Get-Date).Date
+
+# [regex] $excludeMatchRegEx = ‘(?i)‘ + (($excludeMatch | ForEach-Object { [regex]::escape($_) }) –join “|”) + ‘’
+
+[regex] $excludeMatchRegEx = '(?i)' + (($excludeMatch | ForEach-Object { [regex]::escape($_) }) -join "|") + ''
+
+Write-Host "LastWriteTime >= [$minDate]"
+
+Write-Host "From: $from"
+Write-Host "To:   $to"
+
+Write-Host "exclude:      $exclude"
+Write-Host "excludeMatch: $excludeMatch"
+
+
+Read-Host ">>> Ctrl+c to Exit"
+Get-ChildItem -Path $from -Recurse -Exclude $exclude | 
+#(Get-Date).addMinutes(-45)
+Where-Object { $excludeMatch -eq $null -or $_.FullName.Replace($from, "") -notmatch $excludeMatchRegEx -and $_.LastWriteTime -ge $minDate} |
+# Sort-Object -Property Mode -Descending |
+ForEach-Object {
+    Write-Host "-- [$_]"
+
+    if ($_.PSIsContainer -and !(Test-Path $( Join-Path $to $_.FullName.Substring($from.length)))) {
+            Write-Host "CREATING DIR:[$( Join-Path $to $_.FullName.Substring($from.length))]"
+            New-Item $( Join-Path $to $_.FullName.Substring($from.length)) -Type Directory | Out-Null
+    }
+    elseif (!$_.PSIsContainer -and !(Test-Path $(Join-Path $to $_.DirectoryName.Substring($from.length)))){
+            Write-Host "CREATING DIR:[$(Join-Path $to $_.DirectoryName.Substring($from.length))]"
+            New-Item $(Join-Path $to $_.DirectoryName.Substring($from.length)) -Type Directory | Out-Null
+
+    }
+    if(!$_.PSIsContainer ){
+        Write-Output $_        
+    }
+} |
+Copy-Item -Destination {    
+    if ($_.PSIsContainer) {        
+        Join-Path $to $_.Parent.FullName.Substring($from.length) 
+    }
+    else {
+        Join-Path $to $_.FullName.Substring($from.length)
+    } #-Force -WhatIf
+} -Exclude $exclude -PassThru -Force -Recurse| 
+
+ForEach-Object {
+    Write-Host '------------------------------------------------------------------------------'
+} {
+    $_
+    # Write-Host "Copy $_ to $(
+    # if ($_.PSIsContainer) {        
+        
+    #     Join-Path $to $_.Parent.FullName.Substring($from.length)
+    # }
+    # else {
+    #     Join-Path $to $_.FullName.Substring($from.length) 
+    #     # Write-Host Join-Path $to $_.FullName.Substring($from.length)
+    # })"
+} {
+    Write-Host '------------------------------------------------------------------------------'
+}
+
+# Read-Host -Prompt 'Exiting'
