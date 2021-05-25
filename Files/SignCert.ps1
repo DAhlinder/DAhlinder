@@ -16,8 +16,10 @@
 # $cert = @(Get-ChildItem cert:\CurrentUser\My -CodeSigning)[0] 
 # Set-AuthenticodeSignature .\your-script.ps1 $cert
 
-
+# vscode://vscode.github-authentication/did-authenticate?windowid=1&code=7a20156d79aaef6e205b&state=d38fbe65-dd3c-4e25-a7a8-cee27301cfbe
 
 $cert = @(Get-ChildItem cert:\CurrentUser\My -CodeSigning)[0] 
 
 Set-AuthenticodeSignature .\SignedPS.ps1 $cert
+
+Write-Host $profile
